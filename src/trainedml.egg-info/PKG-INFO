@@ -1,0 +1,71 @@
+Metadata-Version: 2.4
+Name: trainedml
+Version: 0.1.0
+Summary: Simple ML training framework
+Author-email: diamankayero <diamanka.tck@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/diamankayero/trainedml
+Project-URL: Issues, https://github.com/diamankayero/trainedml
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENCE
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: matplotlib
+Requires-Dist: seaborn
+Requires-Dist: plotly
+Requires-Dist: tqdm
+Requires-Dist: requests
+Requires-Dist: streamlit
+Requires-Dist: pooch
+Requires-Dist: statsmodels
+Requires-Dist: sphinx_rtd_theme
+Dynamic: license-file
+
+# trainedml
+
+Ce package propose des outils pour charger des jeux de données publics, entraîner et comparer des modèles de machine learning, et visualiser les résultats.
+
+## Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+## Fonctionnalités principales
+- Chargement de jeux de données publics (ex : Iris)
+- Modèles : KNN, Régression Logistique, Random Forest
+- Visualisations : heatmap, histogramme, courbe
+- API simple pour l'entraînement, l'évaluation et la comparaison
+
+## Exemple d'utilisation
+
+```python
+from trainedml.data.loader import DataLoader
+from trainedml.models.knn import KNNModel
+from trainedml.visualization import Visualizer
+
+# Chargement des données
+iris = DataLoader().load_iris()
+
+# Entraînement d'un modèle
+X = iris.drop(columns=['species'])
+y = iris['species']
+model = KNNModel()
+model.fit(X, y)
+
+# Visualisation
+viz = Visualizer(iris)
+fig = viz.heatmap()
+fig.show()
+```
+
+## Tests
+
+```bash
+python -m unittest discover tests
+```

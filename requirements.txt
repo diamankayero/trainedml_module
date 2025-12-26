@@ -1,0 +1,14 @@
+-e .
+setuptools
+scikit-learn
+matplotlib
+pandas
+numpy
+seaborn
+requests
+plotly
+pooch
+tqdm
+statsmodels
+# Ajoutez ici les autres dépendances nécessaires
+sphinx_rtd_theme
