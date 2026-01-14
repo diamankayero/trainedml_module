@@ -7,14 +7,23 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from typing import Optional
 from .vizs import Vizs
+
 
 class HeatmapViz(Vizs):
     """
     Classe pour générer une heatmap de corrélation entre variables (colonnes).
+    
+    Args:
+        data: DataFrame pandas
+        features: 'all' ou liste de colonnes à inclure
+        method: Méthode de corrélation ('pearson', 'spearman', 'kendall')
+        mask: Si True, masque le triangle supérieur
+        save_path: Chemin optionnel pour sauvegarder la figure
     """
-    def __init__(self, data, features='all', method='pearson', mask=True):
-        super().__init__(data)
+    def __init__(self, data, features='all', method='pearson', mask=True, save_path: Optional[str] = None):
+        super().__init__(data, save_path=save_path)
         # Vérification des arguments
         if not isinstance(features, str) and not isinstance(features, list):
             raise ValueError('features doit être une chaîne ou une liste')
@@ -52,4 +61,5 @@ class HeatmapViz(Vizs):
         self._figure = sns.heatmap(corr, mask=mask, annot=True, cmap='coolwarm', square=True)
         plt.title(f"Matrice de corrélation ({self._method})")
         plt.tight_layout()
+        self._auto_save()
         return self._figure

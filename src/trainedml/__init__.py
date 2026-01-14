@@ -8,17 +8,10 @@ et la fonction main pour l'entrée CLI.
 
 # Classe Trainer pour usage API et webapp
 from .data.loader import DataLoader
-from .models.knn import KNNModel
-from .models.logistic import LogisticModel
-from .models.random_forest import RandomForestModel
+from .models import KNNModel, LogisticModel, RandomForestModel, MODEL_MAP, get_model
 from .evaluation import Evaluator
 from sklearn.model_selection import train_test_split
 
-MODEL_MAP = {
-	'knn': KNNModel,
-	'logistic': LogisticModel,
-	'random_forest': RandomForestModel
-}
 
 class Trainer:
     """

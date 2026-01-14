@@ -1,17 +1,10 @@
 import argparse
 from trainedml.data.loader import DataLoader
-from trainedml.models.knn import KNNModel
-from trainedml.models.logistic import LogisticModel
-from trainedml.models.random_forest import RandomForestModel
+from trainedml.models import MODEL_MAP, get_model
 from trainedml.evaluation import Evaluator
 from trainedml.visualization import Visualizer
 from sklearn.model_selection import train_test_split
 
-MODEL_MAP = {
-    'knn': KNNModel,
-    'logistic': LogisticModel,
-    'random_forest': RandomForestModel
-}
 
 def main():
 

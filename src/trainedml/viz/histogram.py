@@ -5,14 +5,23 @@ Permet de tracer un ou plusieurs histogrammes à partir d'un DataFrame pandas.
 
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Optional
 from .vizs import Vizs
+
 
 class HistogramViz(Vizs):
     """
     Classe pour générer un ou plusieurs histogrammes à partir d'une ou plusieurs colonnes.
+    
+    Args:
+        data: DataFrame pandas
+        columns: 'all' ou liste de colonnes à tracer
+        legend: Afficher la légende
+        bins: Nombre de classes
+        save_path: Chemin optionnel pour sauvegarder la figure
     """
-    def __init__(self, data, columns='all', legend=False, bins=10):
-        super().__init__(data)
+    def __init__(self, data, columns='all', legend=False, bins=10, save_path: Optional[str] = None):
+        super().__init__(data, save_path=save_path)
         # Vérification des arguments
         if not isinstance(columns, str) and not isinstance(columns, list):
             raise ValueError('columns doit être une chaîne ou une liste')
@@ -48,4 +57,5 @@ class HistogramViz(Vizs):
             plt.legend()
         plt.tight_layout()
         self._figure = plt.gcf()
+        self._auto_save()
         return self._figure

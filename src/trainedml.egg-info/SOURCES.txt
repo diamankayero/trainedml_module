@@ -21,6 +21,7 @@ src/trainedml/models/factory.py
 src/trainedml/models/knn.py
 src/trainedml/models/logistic.py
 src/trainedml/models/random_forest.py
+src/trainedml/models/regressors.py
 src/trainedml/utils/__init__.py
 src/trainedml/utils/factory.py
 src/trainedml/viz/__init__.py

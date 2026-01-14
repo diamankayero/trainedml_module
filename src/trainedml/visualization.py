@@ -6,7 +6,7 @@ Permet de générer différents types de graphiques et d'analyses à partir d'un
 - Analyses exploratoires (distribution, corrélation, valeurs manquantes, outliers, cible, boxplots, bivariée, normalité, multicolinéarité, profiling)
 """
 
-
+from typing import Optional
 from trainedml.viz.heatmap import HeatmapViz
 from trainedml.viz.histogram import HistogramViz
 from trainedml.viz.line import LineViz
@@ -23,21 +23,44 @@ class Visualizer:
         self.analyzer = DataAnalyzer(data)
 
     # Visualisations classiques
-    def heatmap(self, features='all', method='pearson', mask=True, **kwargs):
-        """Génère une heatmap de corrélation entre variables."""
-        viz = HeatmapViz(self.data, features=features, method=method, mask=mask)
+    def heatmap(self, features='all', method='pearson', mask=True, save_path: Optional[str] = None, **kwargs):
+        """
+        Génère une heatmap de corrélation entre variables.
+        
+        Args:
+            features: 'all' ou liste de colonnes
+            method: Méthode de corrélation ('pearson', 'spearman', 'kendall')
+            mask: Masquer le triangle supérieur
+            save_path: Chemin pour sauvegarder la figure (optionnel)
+        """
+        viz = HeatmapViz(self.data, features=features, method=method, mask=mask, save_path=save_path)
         viz.vizs()
         return viz.figure
 
-    def histogram(self, columns='all', legend=False, bins=10, **kwargs):
-        """Génère un ou plusieurs histogrammes pour les colonnes sélectionnées."""
-        viz = HistogramViz(self.data, columns=columns, legend=legend, bins=bins)
+    def histogram(self, columns='all', legend=False, bins=10, save_path: Optional[str] = None, **kwargs):
+        """
+        Génère un ou plusieurs histogrammes pour les colonnes sélectionnées.
+        
+        Args:
+            columns: 'all' ou liste de colonnes
+            legend: Afficher la légende
+            bins: Nombre de classes
+            save_path: Chemin pour sauvegarder la figure (optionnel)
+        """
+        viz = HistogramViz(self.data, columns=columns, legend=legend, bins=bins, save_path=save_path)
         viz.vizs()
         return viz.figure
 
-    def line(self, x_column, y_column, **kwargs):
-        """Génère une courbe (line plot) entre deux colonnes."""
-        viz = LineViz(self.data, x_column=x_column, y_column=y_column)
+    def line(self, x_column, y_column, save_path: Optional[str] = None, **kwargs):
+        """
+        Génère une courbe (line plot) entre deux colonnes.
+        
+        Args:
+            x_column: Colonne pour l'axe X
+            y_column: Colonne pour l'axe Y
+            save_path: Chemin pour sauvegarder la figure (optionnel)
+        """
+        viz = LineViz(self.data, x_column=x_column, y_column=y_column, save_path=save_path)
         viz.vizs()
         return viz.figure
 

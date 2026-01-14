@@ -12,6 +12,8 @@
 
 ```bash
 python -m pip install --index-url https://test.pypi.org/simple/ trainedml --upgrade
+# oubien
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple trainedml
 ```
 
 > ⚠️ L’option `--no-deps` est nécessaire car TestPyPI ne contient pas toujours toutes les dépendances.

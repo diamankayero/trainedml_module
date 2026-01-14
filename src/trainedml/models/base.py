@@ -1,14 +1,21 @@
 """
 Classe de base abstraite pour tous les modèles de machine learning du projet trainedml.
-Définit l'interface commune à tous les modèles supervisés.
+Définit l'interface commune à tous les modèles supervisés (classification et régression).
 """
 from abc import ABC, abstractmethod
 
+
 class BaseModel(ABC):
     """
-    Classe abstraite pour les modèles de classification.
+    Classe abstraite pour les modèles de machine learning supervisé.
     Toutes les classes de modèles doivent hériter de cette classe et implémenter ses méthodes.
+    
+    Attributes:
+        model: L'objet du modèle sous-jacent (scikit-learn, etc.)
+        task (str): Type de tâche ('classification' ou 'regression')
     """
+    task = 'classification'  # Par défaut, classification
+    
     def __init__(self):
         self.model = None  # L'objet du modèle sous-jacent (scikit-learn, etc.)
 
@@ -26,3 +33,11 @@ class BaseModel(ABC):
     def evaluate(self, X, y):
         """Évalue le modèle sur des données de test et retourne une métrique de performance."""
         pass
+
+
+class BaseRegressor(BaseModel):
+    """
+    Classe abstraite pour les modèles de régression.
+    Hérite de BaseModel avec task='regression'.
+    """
+    task = 'regression'
