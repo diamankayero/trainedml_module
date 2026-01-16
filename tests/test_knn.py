@@ -4,13 +4,13 @@ Test unitaire du modèle KNN avec chargement automatique d'un dataset public (Ir
 import unittest
 from trainedml.data.loader import DataLoader
 from trainedml.models.knn import KNNModel
-from sklearn.model_selection import train_test_split
+from sklearn import model_selection
 
 class TestKNNModel(unittest.TestCase):
     def setUp(self):
         # Chargement du dataset Iris depuis une URL publique
         X, y = DataLoader().load_dataset(name="iris")
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+        self.X_train, self.X_test, self.y_train, self.y_test = model_selection.train_test_split(X, y, test_size=0.3, random_state=42)
 
     def test_fit_predict(self):
         """Teste l'entraînement et la prédiction du modèle KNN sur Iris."""

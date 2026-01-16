@@ -1,0 +1,43 @@
+# Environnements virtuels Python
+venv/
+.venv/
+env/
+.env/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Sphinx documentation
+doc/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
