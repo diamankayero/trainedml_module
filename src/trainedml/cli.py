@@ -1,9 +1,22 @@
 import argparse
 from trainedml.data.loader import DataLoader
-from trainedml.models import MODEL_MAP, get_model
+from trainedml.models import MODEL_MAP, CLASSIFIER_MAP, REGRESSOR_MAP, get_model
 from trainedml.evaluation import Evaluator
 from trainedml.visualization import Visualizer
 from sklearn.model_selection import train_test_split
+
+
+def _is_classification_target(y):
+    """Détermine si la cible est catégorielle (classification) ou numérique (régression)."""
+    import pandas as pd
+    import numpy as np
+    # Si c'est du texte ou catégoriel, c'est de la classification
+    if y.dtype == 'object' or isinstance(y.dtype, pd.CategoricalDtype):
+        return True
+    # Si peu de valeurs uniques (<= 20) et entiers, probablement classification
+    if len(y.unique()) <= 20 and np.issubdtype(y.dtype, np.integer):
+        return True
+    return False
 
 
 def main():
@@ -27,6 +40,11 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=args.test_size, random_state=args.seed)
     print(f"Taille X_train : {X_train.shape}, X_test : {X_test.shape} (seed={args.seed})")
 
+    # Détecter automatiquement le type de tâche
+    is_classification = _is_classification_target(y)
+    task_type = "classification" if is_classification else "régression"
+    print(f"Type de tâche détecté : {task_type}")
+
     import pandas as pd
     if args.url is not None:
         data = pd.concat([X, y], axis=1)
@@ -39,7 +57,15 @@ def main():
     if args.benchmark:
         print("\n--- BENCHMARK ---")
         from trainedml.benchmark import Benchmark
-        models = {name: cls() for name, cls in MODEL_MAP.items()}
+        # Utiliser uniquement les modèles adaptés au type de tâche
+        if is_classification:
+            models_to_use = CLASSIFIER_MAP
+            print(f"Utilisation des classificateurs : {list(models_to_use.keys())}")
+        else:
+            models_to_use = REGRESSOR_MAP
+            print(f"Utilisation des régresseurs : {list(models_to_use.keys())}")
+        
+        models = {name: cls() for name, cls in models_to_use.items()}
         bench = Benchmark(models)
         results = bench.run(X_train, y_train, X_test, y_test)
         for name, res in results.items():
