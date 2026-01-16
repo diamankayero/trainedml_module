@@ -1,6 +1,15 @@
 """
-Visualisation d'un histogramme pour trainedml.
-Permet de tracer un ou plusieurs histogrammes à partir d'un DataFrame pandas.
+Histogram visualization for trainedml.
+
+This module provides the HistogramViz class, which generates histograms for one or more columns
+using matplotlib, supporting custom binning and legend options.
+
+Examples
+--------
+>>> from trainedml.viz.histogram import HistogramViz
+>>> viz = HistogramViz(df, columns=['A', 'B'])
+>>> viz.vizs()
+>>> viz.figure.show()
 """
 
 import numpy as np
@@ -10,15 +19,38 @@ from .vizs import Vizs
 
 
 class HistogramViz(Vizs):
-    """
-    Classe pour générer un ou plusieurs histogrammes à partir d'une ou plusieurs colonnes.
-    
-    Args:
-        data: DataFrame pandas
-        columns: 'all' ou liste de colonnes à tracer
-        legend: Afficher la légende
-        bins: Nombre de classes
-        save_path: Chemin optionnel pour sauvegarder la figure
+    r"""
+    Histogram visualization for one or more columns.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The dataset.
+    columns : 'all' or list, default='all'
+        Columns to plot.
+    legend : bool, default=False
+        Show legend if multiple columns.
+    bins : int, default=10
+        Number of bins.
+
+    Attributes
+    ----------
+    data : pandas.DataFrame
+        The data.
+    columns : list
+        Columns used.
+    legend : bool
+        Legend option.
+    bins : int
+        Number of bins.
+    figure : matplotlib.figure.Figure
+        The generated figure (after calling vizs).
+
+    Examples
+    --------
+    >>> viz = HistogramViz(df, columns=['A', 'B'], bins=20)
+    >>> viz.vizs()
+    >>> viz.figure.show()
     """
     def __init__(self, data, columns='all', legend=False, bins=10, save_path: Optional[str] = None):
         super().__init__(data, save_path=save_path)
@@ -42,20 +74,25 @@ class HistogramViz(Vizs):
     def vizs(self):
         """
         Génère et affiche l'histogramme.
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The generated histogram figure.
         """
         if self._columns == 'all':
             cols = self._data.columns.tolist()
         else:
             cols = self._columns
-        plt.figure(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(8, 6))
         for col in cols:
-            plt.hist(self._data[col], bins=self._bins, alpha=0.7, label=col, edgecolor='black')
-        plt.xlabel('Valeur')
-        plt.ylabel('Fréquence')
-        plt.title('Histogramme')
+            ax.hist(self._data[col].dropna(), bins=self._bins, alpha=0.7, label=col, edgecolor='black')
+        ax.set_xlabel('Valeur')
+        ax.set_ylabel('Fréquence')
+        ax.set_title('Histogramme')
         if self._legend and (len(cols) > 1):
-            plt.legend()
+            ax.legend()
         plt.tight_layout()
-        self._figure = plt.gcf()
+        self._figure = fig
         self._auto_save()
         return self._figure

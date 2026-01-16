@@ -1,28 +1,114 @@
+
 """
-Module de chargement de données publiques en ligne pour trainedml.
-Ce module permet de récupérer automatiquement des jeux de données depuis des sources open data ou des URLs documentées.
+Module de chargement de données publiques pour trainedml.
+
+Ce module fournit la classe `DataLoader` qui permet de charger facilement des jeux de données open data
+ou des fichiers CSV distants, avec gestion du cache local et adaptation automatique du format.
+
+Fonctionnalités principales
+--------------------------
+- Téléchargement et cache automatique de jeux de données publics (Iris, Wine, etc.)
+- Chargement de CSV depuis une URL (avec gestion du séparateur et du hash)
+- Retourne X (features) et y (cible) prêts à l'emploi pour le ML
+- Peut être étendu pour supporter d'autres sources (INSEE, data.gouv.fr, etc.)
+
+Exemple
+-------
+>>> loader = DataLoader()
+>>> X, y = loader.load_dataset(name="iris")
+>>> print(X.shape, y.shape)
 """
 
 
 import pandas as pd
 import pooch
 
+
 class DataLoader:
-    """
+    r"""
     Classe responsable du chargement et de l'abstraction des jeux de données publics.
-    Les autres modules ne connaissent pas la source des données.
+
+    Cette classe isole la logique d'accès aux données : les autres modules n'ont pas à connaître
+    la provenance (URL, open data, local, etc.).
+
+    Fonctionnalités principales
+    --------------------------
+    - Téléchargement et cache automatique de jeux de données publics (Iris, Wine, etc.)
+    - Chargement de CSV depuis une URL (avec gestion du séparateur et du hash)
+    - Retourne X (features) et y (cible) prêts à l'emploi pour le ML
+    - Peut être étendu pour supporter d'autres sources (INSEE, data.gouv.fr, etc.)
+
+    Exemples détaillés
+    -----------------
+    Chargement du dataset Iris (public) :
+    >>> loader = DataLoader()
+    >>> X, y = loader.load_dataset(name="iris")
+    >>> print(X.shape, y.unique())
+
+    Chargement du dataset Wine (public) :
+    >>> X, y = loader.load_dataset(name="wine")
+    >>> print(X.columns)
+
+    Chargement d'un CSV distant avec colonne cible :
+    >>> url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+    >>> X, y = loader.load_dataset(url=url, target="quality")
+    >>> print(X.head())
+
+    Chargement d'un CSV custom (séparateur automatique) :
+    >>> X, y = loader.load_dataset(url="https://.../data.csv", target="classe")
+    >>> print(X.info())
+
+    Notes
+    -----
+    - Pour ajouter un nouveau dataset, il suffit d'ajouter un bloc dans load_dataset.
+    - Le cache local évite de re-télécharger les fichiers à chaque appel.
     """
     def __init__(self):
+        """
+        Initialise un DataLoader.
+
+        Prévu pour extension future : configuration, gestion avancée du cache, etc.
+
+        Examples
+        --------
+        >>> loader = DataLoader()
+        """
         pass
+
 
     def load_csv_from_url(self, url: str, known_hash=None, sep=",") -> pd.DataFrame:
         """
         Télécharge un fichier CSV depuis une URL (avec cache local) et le charge dans un DataFrame pandas.
-        Args:
-            url (str): Lien direct vers le fichier CSV.
-            known_hash (str, optional): Hash du fichier pour vérification (voir doc pooch).
-        Returns:
-            pd.DataFrame: Données chargées.
+
+        Parameters
+        ----------
+        url : str
+            Lien direct vers le fichier CSV.
+        known_hash : str, optional
+            Hash du fichier pour vérification d'intégrité (voir doc pooch).
+        sep : str, default=','
+            Séparateur du CSV (',' ou ';', etc.).
+
+        Returns
+        -------
+        pd.DataFrame
+            Données chargées dans un DataFrame pandas.
+
+        Raises
+        ------
+        RuntimeError
+            Si le téléchargement ou la lecture échoue.
+
+        Examples
+        --------
+        Chargement d'un CSV public :
+        >>> loader = DataLoader()
+        >>> df = loader.load_csv_from_url("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv")
+        >>> print(df.head())
+
+        Chargement d'un CSV avec séparateur point-virgule :
+        >>> df = loader.load_csv_from_url("https://.../winequality-red.csv", sep=';')
+        >>> print(df.columns)
         """
         try:
             fname = pooch.retrieve(
@@ -35,23 +121,66 @@ class DataLoader:
             raise RuntimeError(f"Erreur lors du chargement des données depuis {url} : {e}")
 
 
+
     def load_dataset(self, name=None, url=None, target=None, sep=None):
         """
-        Charge un dataset par nom connu ou URL, et retourne X, y.
-        Args:
-            name (str): nom du dataset ("iris", "wine", etc.)
-            url (str): URL d'un CSV distant
-            target (str): nom de la colonne cible (si url)
-        Returns:
-            X (pd.DataFrame), y (pd.Series)
+        Charge un dataset par nom connu ou URL, et retourne X, y séparés.
+
+        Cette méthode gère automatiquement le téléchargement, le parsing, et la séparation
+        features/cible pour les datasets connus ou les CSV distants.
+
+        Parameters
+        ----------
+        name : str, optional
+            Nom du dataset connu ("iris", "wine", etc.).
+        url : str, optional
+            URL d'un CSV distant à charger.
+        target : str, optional
+            Nom de la colonne cible (obligatoire si url).
+        sep : str, optional
+            Séparateur du CSV (détecté automatiquement pour certains jeux).
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Features (variables explicatives).
+        y : pd.Series
+            Cible (variable à prédire).
+
+        Raises
+        ------
+        ValueError
+            Si aucun dataset connu ou url+target n'est spécifié.
+
+        Examples
+        --------
+        Chargement du dataset Iris :
+        >>> loader = DataLoader()
+        >>> X, y = loader.load_dataset(name="iris")
+        >>> print(X.shape, y.unique())
+
+        Chargement du dataset Wine :
+        >>> X, y = loader.load_dataset(name="wine")
+        >>> print(X.columns)
+
+        Chargement d'un CSV distant :
+        >>> url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+        >>> X, y = loader.load_dataset(url=url, target="quality")
+        >>> print(X.head())
+
+        Chargement d'un CSV custom (séparateur automatique) :
+        >>> X, y = loader.load_dataset(url="https://.../data.csv", target="classe")
+        >>> print(X.info())
         """
         if name == "iris":
+            # Jeu de données Iris (fichier CSV public sur GitHub)
             url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
             df = self.load_csv_from_url(url)
             X = df.drop(columns=["species"])
             y = df["species"]
             return X, y
         elif name == "wine":
+            # Jeu de données Wine (UCI ML repository)
             url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data"
             cols = ["class","alcohol","malic_acid","ash","alcalinity_of_ash","magnesium","total_phenols","flavanoids","nonflavanoid_phenols","proanthocyanins","color_intensity","hue","od280/od315_of_diluted_wines","proline"]
             df = pd.read_csv(url, header=None, names=cols)
@@ -59,6 +188,7 @@ class DataLoader:
             y = df["class"]
             return X, y
         elif url is not None and target is not None:
+            # Chargement générique d'un CSV distant
             # Si le CSV est winequality, utiliser sep=';'
             sep_to_use = sep
             if sep_to_use is None:
@@ -73,4 +203,4 @@ class DataLoader:
         else:
             raise ValueError("Spécifiez un nom de dataset connu ou une url+target.")
 
-    # Ajouter ici d'autres méthodes pour charger d'autres datasets publics (INSEE, data.gouv.fr, etc.)
+    # TODO: Ajouter ici d'autres méthodes pour charger d'autres datasets publics (INSEE, data.gouv.fr, etc.)

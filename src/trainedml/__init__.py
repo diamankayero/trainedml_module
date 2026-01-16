@@ -1,7 +1,29 @@
+
 """
 Module principal du package trainedml.
-Contient la classe Trainer pour l'entraînement, l'évaluation et la prédiction de modèles ML,
-et la fonction main pour l'entrée CLI.
+
+Ce module expose la classe centrale `Trainer` qui permet de gérer tout le workflow de machine learning :
+chargement de données, séparation train/test, entraînement, évaluation et prédiction.
+Il sert aussi de point d'entrée pour la CLI (ligne de commande).
+
+Fonctionnalités principales
+--------------------------
+- API haut niveau pour entraîner, évaluer et prédire avec un modèle ML
+- Supporte les datasets publics (Iris, Wine, etc.) ou des CSV distants
+- Séparation automatique train/test
+- Gestion de plusieurs modèles (KNN, Logistic, Random Forest, etc.)
+- Évaluation standard (accuracy, precision, recall, f1)
+- Peut être utilisé en script, API, ou webapp
+
+Exemple
+-------
+>>> from trainedml import Trainer
+>>> trainer = Trainer(dataset="iris", model="knn")
+>>> trainer.fit()
+>>> results = trainer.evaluate()
+>>> print(results)
+>>> preds = trainer.predict([[5.1, 3.5, 1.4, 0.2]])
+>>> print(preds)
 """
 
 # Ce fichier permet d'importer le package trainedml
@@ -13,26 +35,49 @@ from .evaluation import Evaluator
 from sklearn.model_selection import train_test_split
 
 
-class Trainer:
-    """
-    Classe haut niveau pour entraîner, évaluer et prédire avec un modèle ML.
 
-    Cette classe centralise le workflow machine learning : chargement des données,
-    séparation train/test, entraînement, évaluation et prédiction.
-    Elle est conçue pour être utilisée dans une API, une webapp ou en script.
+class Trainer:
+    r"""
+    Classe haut niveau pour entraîner, évaluer et prédire avec un modèle de machine learning.
+
+    Cette classe centralise tout le workflow ML : chargement des données, split train/test,
+    entraînement, évaluation et prédiction. Elle est conçue pour être utilisée dans une API,
+    une webapp ou en script Python.
+
+    Parameters
+    ----------
+    dataset : str, optional
+        Nom du dataset connu ("iris", "wine", etc.).
+    model : str
+        Nom du modèle à utiliser ("random_forest", "knn", "logistic").
+    url : str, optional
+        URL d'un CSV distant à charger.
+    target : str, optional
+        Nom de la colonne cible (si url).
+    test_size : float
+        Proportion de test (entre 0 et 1).
+    seed : int
+        Graine aléatoire pour la reproductibilité.
+
+    Attributes
+    ----------
+    model : BaseModel
+        Instance du modèle ML utilisé.
+    X_train, X_test, y_train, y_test : array-like
+        Données séparées pour l'entraînement et le test.
+    is_fitted : bool
+        Indique si le modèle a été entraîné.
+
+    Examples
+    --------
+    >>> trainer = Trainer(dataset="iris", model="knn")
+    >>> trainer.fit()
+    >>> results = trainer.evaluate()
+    >>> print(results)
+    >>> preds = trainer.predict([[5.1, 3.5, 1.4, 0.2]])
+    >>> print(preds)
     """
     def __init__(self, dataset=None, model='random_forest', url=None, target=None, test_size=0.2, seed=42):
-        """
-        Initialise un objet Trainer.
-
-        Args:
-            dataset (str, optional): nom du dataset connu ("iris", "wine", etc.)
-            model (str): nom du modèle à utiliser ("random_forest", "knn", "logistic")
-            url (str, optional): URL d'un CSV distant
-            target (str, optional): nom de la colonne cible (si url)
-            test_size (float): proportion de test (0-1)
-            seed (int): graine aléatoire pour la reproductibilité
-        """
         self.dataset = dataset
         self.url = url
         self.target = target
@@ -47,8 +92,15 @@ class Trainer:
         """
         Charge les données, effectue la séparation train/test et les stocke dans l'objet.
 
-        Returns:
-            tuple: (X_train, X_test, y_train, y_test)
+        Returns
+        -------
+        tuple
+            (X_train, X_test, y_train, y_test)
+
+        Raises
+        ------
+        ValueError
+            Si le dataset ou la cible n'est pas spécifié correctement.
         """
         loader = DataLoader()
         X, y = loader.load_dataset(name=self.dataset, url=self.url, target=self.target)
@@ -60,20 +112,31 @@ class Trainer:
         """
         Entraîne le modèle sur les données d'entraînement.
         Charge les données si nécessaire.
+
+        Returns
+        -------
+        self : Trainer
+            L'instance courante (pour chaînage).
         """
         if self.X_train is None:
             self.load_data()
         self.model.fit(self.X_train, self.y_train)
         self.is_fitted = True
+        return self
 
     def evaluate(self):
         """
         Évalue le modèle entraîné sur les données de test.
 
-        Returns:
-            dict: scores de classification (accuracy, precision, recall, f1)
-        Raises:
-            RuntimeError: si le modèle n'est pas entraîné
+        Returns
+        -------
+        dict
+            Dictionnaire des scores de classification (accuracy, precision, recall, f1).
+
+        Raises
+        ------
+        RuntimeError
+            Si le modèle n'est pas entraîné.
         """
         if not self.is_fitted:
             raise RuntimeError("Le modèle doit être entraîné avant l'évaluation.")
@@ -84,18 +147,27 @@ class Trainer:
         """
         Prédit la cible pour de nouvelles données X.
 
-        Args:
-            X (array-like): données d'entrée (mêmes features que l'entraînement)
-        Returns:
-            array: prédictions du modèle
-        Raises:
-            RuntimeError: si le modèle n'est pas entraîné
+        Parameters
+        ----------
+        X : array-like
+            Données d'entrée (mêmes features que l'entraînement).
+
+        Returns
+        -------
+        array
+            Prédictions du modèle.
+
+        Raises
+        ------
+        RuntimeError
+            Si le modèle n'est pas entraîné.
         """
         if not self.is_fitted:
             raise RuntimeError("Le modèle doit être entraîné avant la prédiction.")
         import numpy as np
         X = np.array(X)
         return self.model.predict(X)
+
 
 def main():
     """

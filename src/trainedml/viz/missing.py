@@ -1,10 +1,40 @@
 """
-Analyse des valeurs manquantes pour trainedml.
-Affiche la proportion de valeurs manquantes par colonne.
+Missing value analysis utilities for trainedml.
+
+This module provides functions for analyzing missing values in a pandas DataFrame,
+including counts and visualizations.
+
+Examples
+--------
+>>> from trainedml.viz.missing import missing_summary
+>>> summary = missing_summary(df)
+>>> print(summary)
 """
 
 import matplotlib.pyplot as plt
+import pandas as pd
 from .vizs import Vizs
+
+def missing_summary(data):
+    """
+    Compute the count of missing values per column.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The dataset.
+
+    Returns
+    -------
+    pandas.Series
+        Count of missing values per column.
+
+    Examples
+    --------
+    >>> summary = missing_summary(df)
+    >>> print(summary)
+    """
+    return data.isnull().sum()
 
 class MissingValuesViz(Vizs):
     """

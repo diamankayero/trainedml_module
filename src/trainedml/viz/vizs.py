@@ -1,6 +1,16 @@
 """
-Classe de base pour toutes les visualisations du projet trainedml.
-Fournit une interface commune et vérifie le type des données.
+Base class for trainedml visualizations.
+
+This module provides the Vizs class, which serves as a base for all visualization classes
+in trainedml. It defines the interface and common attributes for visualizations.
+
+Examples
+--------
+>>> from trainedml.viz.vizs import Vizs
+>>> class MyViz(Vizs):
+...     def vizs(self):
+...         # custom plotting code
+...         pass
 """
 
 import os

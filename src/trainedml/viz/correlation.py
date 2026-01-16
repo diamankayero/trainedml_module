@@ -1,11 +1,47 @@
 """
-Matrice de corrélation (heatmap) pour trainedml.
-Permet de visualiser les corrélations entre variables numériques.
+Correlation analysis utilities for trainedml.
+
+This module provides functions and classes for computing and visualizing correlation matrices
+between variables, supporting different correlation methods and visual outputs.
+
+Examples
+--------
+>>> from trainedml.viz.correlation import correlation_matrix
+>>> corr = correlation_matrix(df)
+>>> print(corr)
 """
+
+import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from .vizs import Vizs
+
+def correlation_matrix(data, features='all', method='pearson'):
+    """
+    Compute the correlation matrix for selected features.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The dataset.
+    features : 'all' or list, default='all'
+        Features to include.
+    method : str, default='pearson'
+        Correlation method ('pearson', 'spearman', 'kendall').
+
+    Returns
+    -------
+    pandas.DataFrame
+        Correlation matrix.
+
+    Examples
+    --------
+    >>> corr = correlation_matrix(df, features=['A', 'B'], method='spearman')
+    >>> print(corr)
+    """
+    cols = data.columns.tolist() if features == 'all' else features
+    return data[cols].corr(method=method)
 
 class CorrelationViz(Vizs):
     """

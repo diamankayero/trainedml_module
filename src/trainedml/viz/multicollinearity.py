@@ -1,12 +1,55 @@
 """
-Analyse de la multicolinéarité pour trainedml.
-Calcule le VIF (Variance Inflation Factor) pour chaque variable numérique.
+Multicollinearity analysis utilities for trainedml.
+
+This module provides functions for computing the Variance Inflation Factor (VIF)
+to assess multicollinearity among features in a pandas DataFrame.
+
+Mathematical context
+--------------------
+- VIF: $VIF_j = \frac{1}{1 - R_j^2}$
+
+Examples
+--------
+>>> from trainedml.viz.multicollinearity import vif_summary
+>>> vif = vif_summary(df)
+>>> print(vif)
 """
 
 import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from .vizs import Vizs
+
+def vif_summary(data):
+    """
+    Compute the Variance Inflation Factor (VIF) for each feature.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The dataset (numeric features only).
+
+    Returns
+    -------
+    pandas.Series
+        VIF per feature.
+
+    Notes
+    -----
+    $VIF_j = \frac{1}{1 - R_j^2}$
+    where $R_j^2$ is the $R^2$ of regressing feature $j$ on all others.
+
+    Examples
+    --------
+    >>> vif = vif_summary(df)
+    >>> print(vif)
+    """
+    X = data.select_dtypes(include=[float, int])
+    vif = pd.Series(
+        [variance_inflation_factor(X.values, i) for i in range(X.shape[1])],
+        index=X.columns
+    )
+    return vif
 
 class MulticollinearityViz(Vizs):
     """

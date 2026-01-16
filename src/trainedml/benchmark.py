@@ -1,7 +1,38 @@
 """
-Module de benchmark pour comparer plusieurs modèles sur un même jeu de données.
-Supporte la parallélisation et l'affichage de la progression.
+Benchmark utilities for comparing multiple models in trainedml.
+
+This module provides the Benchmark class to compare the performance (accuracy, speed, etc.)
+of several models on the same dataset, with optional parallelization and progress bar.
+
+Mathematical Formulation
+------------------------
+Let $\mathcal{M} = \{M_1, ..., M_K\}$ be a set of models. For each model $M_k$:
+- Fit time: $T_{fit}^{(k)}$
+- Predict time: $T_{pred}^{(k)}$
+- Score: $S^{(k)}$ (e.g., accuracy)
+
+The benchmark returns a dictionary:
+
+.. code-block:: python
+
+    {
+        'model_name': {
+            'scores': {...},
+            'fit_time': ...,
+            'predict_time': ...
+        },
+        ...
+    }
+
+Examples
+--------
+>>> from trainedml.benchmark import Benchmark
+>>> models = {'knn': KNNModel(), 'rf': RandomForestModel()}
+>>> bench = Benchmark(models)
+>>> results = bench.run(X_train, y_train, X_test, y_test)
+>>> print(results)
 """
+
 import time
 from typing import Dict, Any, Optional
 from tqdm import tqdm
@@ -11,11 +42,21 @@ from .evaluation import Evaluator
 
 def _train_and_evaluate(name, model, X_train, y_train, X_test, y_test):
     """
-    Fonction helper pour entraîner et évaluer un modèle unique.
-    Utilisée pour la parallélisation.
-    
-    Returns:
-        tuple: (nom, résultats)
+    Helper function to train and evaluate a single model (for parallelization).
+
+    Parameters
+    ----------
+    name : str
+        Model name.
+    model : object
+        Model instance (must implement fit, predict).
+    X_train, y_train, X_test, y_test : array-like
+        Data splits.
+
+    Returns
+    -------
+    tuple
+        (model name, results dict)
     """
     # Mesure du temps d'entraînement
     start_fit = time.time()
@@ -36,13 +77,37 @@ def _train_and_evaluate(name, model, X_train, y_train, X_test, y_test):
 
 
 class Benchmark:
-    """
-    Classe pour comparer les performances de plusieurs modèles de classification/régression.
-    
-    Supporte:
-    - Exécution séquentielle ou parallèle (via joblib)
-    - Barre de progression (via tqdm)
-    - Mesure des temps d'entraînement et de prédiction
+    r"""
+    Class for comparing the performance of multiple classification/regression models.
+
+    Supports sequential or parallel execution, progress bar, and timing.
+
+    Parameters
+    ----------
+    models : dict
+        Dictionary {name: model_instance}.
+
+    Attributes
+    ----------
+    models : dict
+        Models to benchmark.
+    results : dict or None
+        Results after running the benchmark.
+
+    Methods
+    -------
+    run(X_train, y_train, X_test, y_test, parallel=False, n_jobs=-1, show_progress=True)
+        Run the benchmark and return results.
+    summary()
+        Return a formatted summary of the results.
+    print_summary()
+        Print the summary to stdout.
+
+    Examples
+    --------
+    >>> bench = Benchmark({'knn': KNNModel(), 'rf': RandomForestModel()})
+    >>> results = bench.run(X_train, y_train, X_test, y_test)
+    >>> bench.print_summary()
     """
     def __init__(self, models: Dict[str, Any]):
         """
@@ -63,19 +128,23 @@ class Benchmark:
         show_progress: bool = True
     ) -> Dict[str, Dict]:
         """
-        Entraîne et évalue chaque modèle, retourne les scores et les temps d'exécution.
-        
-        Args:
-            X_train: Données d'entraînement
-            y_train: Cibles d'entraînement
-            X_test: Données de test
-            y_test: Cibles de test
-            parallel (bool): Si True, exécute les modèles en parallèle (défaut: False)
-            n_jobs (int): Nombre de jobs pour la parallélisation (-1 = tous les cœurs)
-            show_progress (bool): Si True, affiche une barre de progression (défaut: True)
-        
-        Returns:
-            dict: {nom_modele: {scores, fit_time, predict_time}}
+        Train and evaluate each model, returning scores and timing.
+
+        Parameters
+        ----------
+        X_train, y_train, X_test, y_test : array-like
+            Data splits.
+        parallel : bool, default=False
+            If True, run models in parallel.
+        n_jobs : int, default=-1
+            Number of jobs for parallelization.
+        show_progress : bool, default=True
+            Show a progress bar.
+
+        Returns
+        -------
+        dict
+            {model_name: {scores, fit_time, predict_time}}
         """
         results = {}
         
@@ -136,10 +205,12 @@ class Benchmark:
     
     def summary(self) -> Optional[str]:
         """
-        Retourne un résumé formaté des résultats du benchmark.
-        
-        Returns:
-            str: Résumé textuel des résultats, ou None si pas de résultats
+        Return a formatted summary of the benchmark results.
+
+        Returns
+        -------
+        str or None
+            Text summary, or None if no results.
         """
         if self.results is None:
             return None
@@ -170,7 +241,9 @@ class Benchmark:
         return "\n".join(lines)
     
     def print_summary(self):
-        """Affiche le résumé du benchmark."""
+        """
+        Print the summary of the benchmark results.
+        """
         summary = self.summary()
         if summary:
             print(summary)

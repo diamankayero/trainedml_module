@@ -1,14 +1,49 @@
 """
-Boxplots par variable pour trainedml.
-Affiche les boxplots pour chaque variable numérique, éventuellement groupés par une variable catégorielle.
+Boxplot visualization for trainedml.
+
+This module provides the BoxplotViz class, which generates boxplots for one or more columns
+using matplotlib, supporting grouping by another variable.
+
+Examples
+--------
+>>> from trainedml.viz.boxplot import BoxplotViz
+>>> viz = BoxplotViz(df, columns=['A', 'B'])
+>>> viz.vizs()
+>>> viz.figure.show()
 """
 
 import matplotlib.pyplot as plt
 from .vizs import Vizs
 
 class BoxplotViz(Vizs):
-    """
-    Classe pour générer des boxplots par variable.
+    r"""
+    Boxplot visualization for one or more columns.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The dataset.
+    columns : 'all' or list, default='all'
+        Columns to plot.
+    by : str or None, default=None
+        Grouping variable.
+
+    Attributes
+    ----------
+    data : pandas.DataFrame
+        The data.
+    columns : list
+        Columns used.
+    by : str or None
+        Grouping variable.
+    figure : matplotlib.figure.Figure
+        The generated figure (after calling vizs).
+
+    Examples
+    --------
+    >>> viz = BoxplotViz(df, columns=['A', 'B'], by='Group')
+    >>> viz.vizs()
+    >>> viz.figure.show()
     """
     def __init__(self, data, columns='all', by=None):
         super().__init__(data)
@@ -16,6 +51,14 @@ class BoxplotViz(Vizs):
         self._by = by
 
     def vizs(self):
+        """
+        Generate the boxplot figure.
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The generated boxplot figure.
+        """
         if self._columns == 'all':
             cols = self._data.select_dtypes(include='number').columns.tolist()
         else:
@@ -32,3 +75,4 @@ class BoxplotViz(Vizs):
                 ax.set_title(f"Boxplot de {col}")
         plt.tight_layout()
         self._figure = fig
+        return fig

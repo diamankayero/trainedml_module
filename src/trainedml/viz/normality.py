@@ -1,4 +1,52 @@
 """
+Normality test utilities for trainedml.
+
+This module provides functions for testing the normality of variables in a pandas DataFrame,
+using Shapiro-Wilk, D'Agostino, and Anderson-Darling tests.
+
+Examples
+--------
+>>> from trainedml.viz.normality import normality_tests
+>>> results = normality_tests(df)
+>>> print(results)
+"""
+
+import pandas as pd
+from scipy import stats
+
+def normality_tests(data, columns='all'):
+    """
+    Perform normality tests on selected columns.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The dataset.
+    columns : 'all' or list, default='all'
+        Columns to test.
+
+    Returns
+    -------
+    dict
+        Dictionary of test results per column.
+
+    Examples
+    --------
+    >>> results = normality_tests(df, columns=['A', 'B'])
+    >>> print(results)
+    """
+    cols = data.columns.tolist() if columns == 'all' else columns
+    results = {}
+    for col in cols:
+        x = data[col].dropna()
+        results[col] = {
+            'shapiro': stats.shapiro(x),
+            'dagostino': stats.normaltest(x),
+            'anderson': stats.anderson(x)
+        }
+    return results
+
+"""
 Analyse de la normalité pour trainedml.
 Affiche un QQ-plot pour chaque variable numérique.
 """

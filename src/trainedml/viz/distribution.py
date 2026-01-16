@@ -1,10 +1,43 @@
 """
-Distribution des variables (histogrammes) pour trainedml.
-Permet de visualiser la distribution de chaque variable numérique.
+Distribution analysis utilities for trainedml.
+
+This module provides functions and classes for analyzing and visualizing the distribution
+of variables, including histograms and summary statistics.
+
+Examples
+--------
+>>> from trainedml.viz.distribution import distribution_summary
+>>> summary = distribution_summary(df)
+>>> print(summary)
 """
 
+import pandas as pd
 import matplotlib.pyplot as plt
 from .vizs import Vizs
+
+def distribution_summary(data, columns='all'):
+    """
+    Compute summary statistics for selected columns.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The dataset.
+    columns : 'all' or list, default='all'
+        Columns to summarize.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Summary statistics (mean, std, min, max, etc.).
+
+    Examples
+    --------
+    >>> summary = distribution_summary(df, columns=['A', 'B'])
+    >>> print(summary)
+    """
+    cols = data.columns.tolist() if columns == 'all' else columns
+    return data[cols].describe()
 
 class DistributionViz(Vizs):
     """

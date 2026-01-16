@@ -1,6 +1,20 @@
 """
-Visualisation des corrélations entre variables sous forme de carte de chaleur (heatmap).
-Permet de choisir les colonnes/features à inclure, la méthode de corrélation et l'affichage du masque.
+Heatmap visualization for correlation matrices in trainedml.
+
+This module provides the HeatmapViz class, which generates correlation heatmaps
+using matplotlib and seaborn, supporting various correlation methods and masking options.
+
+Mathematical context
+--------------------
+- Pearson, Spearman, Kendall correlation
+- Masking upper triangle for symmetric matrices
+
+Examples
+--------
+>>> from trainedml.viz.heatmap import HeatmapViz
+>>> viz = HeatmapViz(df)
+>>> viz.vizs()
+>>> viz.figure.show()
 """
 
 import numpy as np
@@ -12,15 +26,38 @@ from .vizs import Vizs
 
 
 class HeatmapViz(Vizs):
-    """
-    Classe pour générer une heatmap de corrélation entre variables (colonnes).
-    
-    Args:
-        data: DataFrame pandas
-        features: 'all' ou liste de colonnes à inclure
-        method: Méthode de corrélation ('pearson', 'spearman', 'kendall')
-        mask: Si True, masque le triangle supérieur
-        save_path: Chemin optionnel pour sauvegarder la figure
+    r"""
+    Correlation heatmap visualization.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The dataset.
+    features : 'all' or list, default='all'
+        Features to include.
+    method : str, default='pearson'
+        Correlation method ('pearson', 'spearman', 'kendall').
+    mask : bool, default=True
+        Whether to mask the upper triangle.
+
+    Attributes
+    ----------
+    data : pandas.DataFrame
+        The data.
+    features : list
+        Features used.
+    method : str
+        Correlation method.
+    mask : bool
+        Masking option.
+    figure : matplotlib.figure.Figure
+        The generated figure (after calling vizs).
+
+    Examples
+    --------
+    >>> viz = HeatmapViz(df, features=['A', 'B'])
+    >>> viz.vizs()
+    >>> viz.figure.show()
     """
     def __init__(self, data, features='all', method='pearson', mask=True, save_path: Optional[str] = None):
         super().__init__(data, save_path=save_path)
