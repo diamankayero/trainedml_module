@@ -1,5 +1,3 @@
-
-
 # trainedml
 
 `trainedml` est un package Python qui fournit des outils simples pour **charger des jeux de données publics**, **entraîner et comparer des modèles de machine learning**, et **visualiser les résultats** de manière intuitive.
@@ -89,6 +87,13 @@ Pour exécuter les tests unitaires :
 ```bash
 python -m unittest discover tests
 ```
+
+---
+
+## 🆕 Nouveauté 2026
+
+- Ajout du workflow GitHub Actions pour tests automatiques et publication sur TestPyPI.
+- Amélioration de la documentation et de la structure du projet.
 
 ---
 
