@@ -1,0 +1,10 @@
+include README.md
+include LICENSE
+include requirements.txt
+recursive-include src *
+recursive-include tests *
+recursive-include doc *
+global-exclude *.pyc
+global-exclude __pycache__
+prune build
+prune dist

@@ -19,38 +19,23 @@ from .vizs import Vizs
 
 class LineViz(Vizs):
     r"""
-    Line plot visualization between two columns.
+    Visualisation de courbe entre deux colonnes.
 
-    Parameters
+    Paramètres
     ----------
     data : pandas.DataFrame
-        The dataset.
+        Le jeu de données.
     x_column : str
-        Column for the x-axis.
+        Colonne pour l'axe des x.
     y_column : str
-        Column for the y-axis.
-
-    Attributes
-    ----------
-    data : pandas.DataFrame
-        The data.
-    x_column : str
-        X-axis column.
-    y_column : str
-        Y-axis column.
-    figure : matplotlib.figure.Figure
-        The generated figure (after calling vizs).
-
-    Examples
-    --------
-    >>> viz = LineViz(df, x_column='A', y_column='B')
-    >>> viz.vizs()
-    >>> viz.figure.show()
+        Colonne pour l'axe des y.
+    save_path : str ou None
+        Chemin de sauvegarde optionnel.
     """
-    def __init__(self, data, x_column, y_column, save_path: Optional[str] = None):
-        super().__init__(data, save_path=save_path)
-        self.x_column = x_column
-        self.y_column = y_column
+    def __init__(self, data: pd.DataFrame, x_column: str, y_column: str, save_path: Optional[str] = None):
+        super().__init__(data, save_path)
+        self._x_column = x_column
+        self._y_column = y_column
 
     def vizs(self):
         """

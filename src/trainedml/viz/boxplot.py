@@ -17,37 +17,21 @@ from .vizs import Vizs
 
 class BoxplotViz(Vizs):
     r"""
-    Boxplot visualization for one or more columns.
+    Visualisation de boxplots pour une ou plusieurs colonnes.
 
-    Parameters
+    Paramètres
     ----------
     data : pandas.DataFrame
-        The dataset.
-    columns : 'all' or list, default='all'
-        Columns to plot.
-    by : str or None, default=None
-        Grouping variable.
-
-    Attributes
-    ----------
-    data : pandas.DataFrame
-        The data.
-    columns : list
-        Columns used.
-    by : str or None
-        Grouping variable.
-    figure : matplotlib.figure.Figure
-        The generated figure (after calling vizs).
-
-    Examples
-    --------
-    >>> viz = BoxplotViz(df, columns=['A', 'B'], by='Group')
-    >>> viz.vizs()
-    >>> viz.figure.show()
+        Le jeu de données.
+    columns : 'all' ou list, default='all'
+        Colonnes à tracer.
+    by : str ou None, default=None
+        Variable de regroupement.
     """
-    def __init__(self, data, columns='all', by=None):
+    def __init__(self, data: pd.DataFrame, columns: 'list[str]' | str = 'all', by: str | None = None):
         super().__init__(data)
         self._columns = columns
+        self._by = by
         self._by = by
 
     def vizs(self):

@@ -39,15 +39,22 @@ pip install -r requirements.txt
 * Chargement de jeux de données publics (ex : **Iris**)
 * Modèles implémentés :
 
-  * KNN
+  * KNN (classification et régression)
   * Régression logistique
-  * Random Forest
+  * Random Forest (classification et régression)
+  * Régression linéaire, Ridge, Lasso
 * Visualisations :
 
   * Heatmap
   * Histogrammes
   * Courbes
+  * Boxplots, bivarié, valeurs manquantes, outliers, normalité, multicolinéarité, profiling
 * API simple pour :
+* Exemples avancés :
+
+  * Benchmark de modèles de régression
+  * Analyse exploratoire complète (profiling, multicolinéarité, normalité)
+  * Visualisation de la distribution de la cible (régression)
 
   * l’entraînement
   * l’évaluation
